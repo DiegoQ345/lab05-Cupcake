@@ -49,7 +49,7 @@ import com.example.cupcake.ui.theme.CupcakeTheme
 @Composable
 fun StartOrderScreen(
     quantityOptions: List<Pair<Int, Int>>,
-    onNextButtonClicked: (Int) -> Unit,  // Modificación: Se agrega este parámetro de función.
+    onNextButtonClicked: (Int) -> Unit = {},  // Modificación para que no nos de error
     modifier: Modifier = Modifier
 ) {
     Column(

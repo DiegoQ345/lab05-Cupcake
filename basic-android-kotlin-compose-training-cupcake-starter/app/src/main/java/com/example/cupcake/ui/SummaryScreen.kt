@@ -48,8 +48,8 @@ import com.example.cupcake.ui.theme.CupcakeTheme
 @Composable
 fun OrderSummaryScreen(
     orderUiState: OrderUiState,
-    onCancelButtonClicked: () -> Unit,  // Modificación: Se agrega este parámetro para cancelar.
-    onSendButtonClicked: (String, String) -> Unit,  // Modificación: Se agrega este parámetro para enviar.
+    onCancelButtonClicked: () -> Unit = {},  // Modificación se agrega el valor por defecto
+    onSendButtonClicked: (String, String) -> Unit = { _, _ -> },  // Modificación se agrega valores por defecto para las dos entradas.
     modifier: Modifier = Modifier
 ) {
     val resources = LocalContext.current.resources
