@@ -15,6 +15,7 @@
  */
 package com.example.cupcake.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,18 +49,18 @@ import com.example.cupcake.ui.theme.CupcakeTheme
 @Composable
 fun OrderSummaryScreen(
     orderUiState: OrderUiState,
-    onCancelButtonClicked: () -> Unit = {},  // Modificación se agrega el valor por defecto
-    onSendButtonClicked: (String, String) -> Unit = { _, _ -> },  // Modificación se agrega valores por defecto para las dos entradas.
+    onCancelButtonClicked: () -> Unit = {},
+    onSendButtonClicked: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     val resources = LocalContext.current.resources
+    val context = LocalContext.current
 
     val numberOfCupcakes = resources.getQuantityString(
         R.plurals.cupcakes,
         orderUiState.quantity,
         orderUiState.quantity
     )
-    //Load and format a string resource with the parameters.
     val orderSummary = stringResource(
         R.string.order_details,
         numberOfCupcakes,
@@ -68,15 +69,32 @@ fun OrderSummaryScreen(
         orderUiState.quantity
     )
     val newOrder = stringResource(R.string.new_cupcake_order)
-    //Create a list of order summary to display
+
     val items = listOf(
-        // Summary line 1: display selected quantity
         Pair(stringResource(R.string.quantity), numberOfCupcakes),
-        // Summary line 2: display selected flavor
         Pair(stringResource(R.string.flavor), orderUiState.flavor),
-        // Summary line 3: display selected pickup date
         Pair(stringResource(R.string.pickup_date), orderUiState.date)
     )
+
+    // Función para compartir el resumen del pedido
+    fun shareOrderSummary() {
+        // Construcción del mensaje a compartir: junta todos los elementos en una cadena de texto
+        // Cada item es representado como un par "clave: valor", separado por saltos de línea
+        val shareMessage = items.joinToString("\n") { "${it.first}: ${it.second}" }
+
+        // Creación de la intención para compartir el mensaje
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            // Establece el tipo de contenido como texto plano
+            type = "text/plain"
+
+            // Agrega el mensaje al intent, para ser compartido
+            putExtra(Intent.EXTRA_TEXT, shareMessage)
+        }
+
+        // Inicia la actividad de selección para compartir el mensaje, permitiendo al usuario elegir la aplicación
+        context.startActivity(Intent.createChooser(shareIntent, null))
+    }
+
 
     Column(
         modifier = modifier,
@@ -105,13 +123,16 @@ fun OrderSummaryScreen(
             ) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onSendButtonClicked(newOrder, orderSummary) }  // Modificación: Se pasa la función para enviar.
+                    onClick = {
+                        // Llamar a la función para compartir
+                        shareOrderSummary()
+                    }
                 ) {
                     Text(stringResource(R.string.send))
                 }
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = onCancelButtonClicked  // Modificación: Se pasa la función para cancelar.
+                    onClick = onCancelButtonClicked
                 ) {
                     Text(stringResource(R.string.cancel))
                 }
@@ -119,6 +140,7 @@ fun OrderSummaryScreen(
         }
     }
 }
+
 
 @Preview
 @Composable
